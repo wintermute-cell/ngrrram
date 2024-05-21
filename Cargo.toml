@@ -1,0 +1,13 @@
+[package]
+name = "ngrrram"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+ratatui = { version = "0.26.2", features = ["all-widgets"]}
+crossterm = "0.27.0"  # ratatui dependency
+clap    = { version = "4.5.4", features = ["derive"]}
+rand = "0.8.5"
+

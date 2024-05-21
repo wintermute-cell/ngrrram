@@ -1,0 +1,130 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: macos-latest
+            target: x86_64-apple-darwin
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        target: ${{ matrix.target }}
+
+    - name: Cache cargo registry
+      uses: actions/cache@v2
+      with:
+        path: ~/.cargo/registry
+        key: ${{ runner.os }}-cargo-registry
+        restore-keys: |
+          ${{ runner.os }}-cargo-registry
+
+    - name: Cache cargo index
+      uses: actions/cache@v2
+      with:
+        path: ~/.cargo/git
+        key: ${{ runner.os }}-cargo-index
+        restore-keys: |
+          ${{ runner.os }}-cargo-index
+
+    - name: Build
+      run: cargo build --release --target ${{ matrix.target }}
+
+    - name: Package
+      run: |
+        if [ $RUNNER_OS == 'Windows' ]; then
+          mkdir -p dist && cp target/${{ matrix.target }}/release/ngrrram.exe dist/
+        else
+          mkdir -p dist && cp target/${{ matrix.target }}/release/ngrrram dist/
+        fi
+      shell: bash
+
+    - name: Upload Release Asset
+      uses: actions/upload-artifact@v2
+      with:
+        name: ngrrram-${{ matrix.target }}
+        path: dist/
+        retention-days: 1
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+
+    - name: Download Release Assets
+      uses: actions/download-artifact@v2
+      with:
+        name: ngrrram-x86_64-unknown-linux-gnu
+        path: ./dist/linux
+    - name: Download Release Assets
+      uses: actions/download-artifact@v2
+      with:
+        name: ngrrram-x86_64-apple-darwin
+        path: ./dist/macos
+    - name: Download Release Assets
+      uses: actions/download-artifact@v2
+      with:
+        name: ngrrram-x86_64-pc-windows-msvc
+        path: ./dist/windows
+
+    - name: Upload Linux Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/linux/ngrrram
+        asset_name: ngrrram-linux
+        asset_content_type: application/octet-stream
+
+    - name: Upload macOS Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/macos/ngrrram
+        asset_name: ngrrram-macos
+        asset_content_type: application/octet-stream
+
+    - name: Upload Windows Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/windows/ngrrram.exe
+        asset_name: ngrrram-windows.exe
+        asset_content_type: application/octet-stream
+
