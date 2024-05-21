@@ -108,11 +108,7 @@ fn get_ngrams(args: &Args) -> Vec<String> {
         "3" => ngrams::get_trigrams(),
         "4" => ngrams::get_tetragrams(),
         "w" => ngrams::get_wordlist(),
-        "_" => try_get_from_file(&args.n),
-        &_ => {
-            println!("Invalid argument for n. Use 2, 3, 4, w or a file path.");
-            std::process::exit(1);
-        }
+        &_ => try_get_from_file(&args.n),
     };
     ngrams
 }
