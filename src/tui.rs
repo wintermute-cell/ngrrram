@@ -54,7 +54,10 @@ fn render(frame: &mut Frame, state: &AppState, args: &Args, kb_string: &String, 
         title_block,
         layout[0],
     );
-    let title: Paragraph = Paragraph::new("ngrrram!").bold();
+    let title: Paragraph = Paragraph::new(Line::from(vec![
+        "               ngrrram!".bold(),
+        "   by winterveil".italic().gray(),
+    ]));
     frame.render_widget(
         title.alignment(Alignment::Center),
         Layout::default()
