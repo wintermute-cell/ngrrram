@@ -4,7 +4,7 @@
 particular order) to improve your typing speed and/or learn new keyboard
 layouts effectively.
 
-![a showcase of the ngrrram ui](./showcase.gif)
+![a showcase of the ngrrram ui](./.github/showcase.gif)
 
 Certain letter combination occur a lot more often than others, thus practicing
 these in particular makes sense. This type of practice is often recommended for
