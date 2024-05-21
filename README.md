@@ -25,10 +25,10 @@ ones.
 
 ## Installation
 
-### Looking for help packaging!
+### Releases
 
-For now `ngrrram` is not available in any package repo. If you'd like to help
-by packaging for your platform, I'd gladly accept!
+Precompiled [releases](https://github.com/wintermute-cell/ngrrram/releases) for
+linux, windows and macos are available.
 
 ### From Source
 
@@ -39,6 +39,11 @@ cargo build --release
 ```
 
 The executable will then be located at `./target/release/ngrrram`
+
+### Looking for help packaging!
+
+For now `ngrrram` is not available in any package repo. If you'd like to help
+by packaging for your platform, I'd gladly accept!
 
 ## Usage
 
