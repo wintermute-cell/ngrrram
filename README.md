@@ -58,8 +58,8 @@ Options:
 --rep <number>               how often to repeat *each* different ngram in a lesson.
 --wpm <number>               the wpm threshold at which the lesson is considered a success.
 --acc <0-100>                the accuracy in percent at which the lesson is considered a success.
---emu_in <layout>            see section (## Layout Emulation).
---emu_out <layout>           see section (## Layout Emulation).
+--emu-in <layout>            see section (## Layout Emulation).
+--emu-out <layout>           see section (## Layout Emulation).
 --nokb                       pass this flag to disable the keyboard layout display.
 --cat                        the most important flag. don't practice alone.
 ```
@@ -72,7 +72,7 @@ ngrrram --n 2 --top 50 --combi 2 --rep 3 --wpm 40 --acc 100
 ## Layout Emulation
 
 To emulate a different keyboard layout in `ngrrram`, you must pass the flags
-`--emu_in` and `--emu_out`, the first one describing your current layout, and
+`--emu-in` and `--emu-out`, the first one describing your current layout, and
 the second one being the one you want to emulate.
 
 Available layouts are:
