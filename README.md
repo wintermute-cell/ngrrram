@@ -30,11 +30,21 @@ ones.
 Precompiled [releases](https://github.com/wintermute-cell/ngrrram/releases) for
 linux, windows and macos are available.
 
+### AUR (maintained by [JinEnMok](https://github.com/JinEnMok))
+
+Use `yay` or any other AUR helper to install for an Archlinux system:
+
+```bash
+yay -S ngrrram-git
+or
+yay -S ngrrram-bin
+```
+
 ### From Source
 
 Make sure you have the rust tooling installed, then simply run:
 
-```
+```bash
 cargo build --release
 ```
 
