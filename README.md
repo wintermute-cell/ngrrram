@@ -85,7 +85,7 @@ Available layouts are:
 - `colemakdh` (ColemakDH)
 
 > Having to provide an input layout is sub-optimal. I'm not sure how to get
-> layout independant scancodes in rust; Could not get `device_query` to work.
+> layout independent scancodes in rust; Could not get `device_query` to work.
 > If you know a solution, please tell me.
 
 ## Random Notes
