@@ -1,71 +1,103 @@
 use clap::Parser;
 
-mod tui;
-mod game;
-mod ngrams;
-mod layout;
 mod cat;
+mod game;
+mod layout;
+mod ngrams;
+mod tui;
 
 #[derive(Parser)]
 //#[command(author, version, about, long_about = None)]
 struct Args {
-
-    #[arg(short, long, default_value = "2",
+    #[arg(
+        short,
+        long,
+        default_value = "2",
         value_name = "2|3|4|w|file",
         help = "use bi-(2), tri-(3), tetragrams(4), (w)ords or comma separated wordlist file."
     )]
     n: String,
 
-    #[arg(short, long, default_value = "50",
+    #[arg(
+        short,
+        long,
+        default_value = "50",
         value_name = "1-200",
         help = "use the top X ngrams ordered by usage."
     )]
     top: i32,
 
-    #[arg(short, long, default_value = "2",
+    #[arg(
+        short,
+        long,
+        default_value = "2",
         value_name = "1-200",
         help = "how many different ngrams to use in a single lesson."
     )]
     combi: i32,
 
-    #[arg(short, long, default_value = "3",
+    #[arg(
+        short,
+        long,
+        default_value = "3",
         value_name = "number",
         help = "how often to repeat *each* different ngram in a lesson."
     )]
     rep: i32,
 
-    #[arg(short, long, default_value = "40",
+    #[arg(
+        short,
+        long,
+        default_value = "40",
         value_name = "number",
         help = "the wpm threshold at which the lesson is considered a success."
     )]
     wpm: i32,
 
-    #[arg(short, long, default_value = "94",
+    #[arg(
+        short,
+        long,
+        default_value = "94",
         value_name = "0-100",
         help = "the accuracy in percent at which the lesson is considered a success."
     )]
     acc: i32,
 
-    #[arg(long, action, default_value = "",
+    #[arg(
+        long,
+        action,
+        default_value = "",
         value_name = "layout",
         help = "your current keyboard layout. only needed if you want to emulate a different layout. see docs for supported layouts."
     )]
     emu_in: String,
 
-    #[arg(long, action, default_value = "",
+    #[arg(
+        long,
+        action,
+        default_value = "",
         value_name = "layout",
         help = "the layout you want to emulate. only needed if you want to emulate a different layout. see docs for supported layouts."
     )]
     emu_out: String,
 
-    #[arg(long, action,
+    #[arg(
+        long,
+        action,
+        default_value = "false",
+        value_name = "bool",
+        help = "show keyboard in ortholinear format"
+    )]
+    show_ortho: bool,
+
+    #[arg(
+        long,
+        action,
         help = "pass this flag to disable the keyboard layout display."
     )]
     nokb: bool,
 
-    #[arg(long, action,
-        help = "the most important flag. don't practice alone."
-    )]
+    #[arg(long, action, help = "the most important flag. don't practice alone.")]
     cat: bool,
 }
 
@@ -160,9 +192,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "dvorak" => layout::Layout::Dvorak,
         "colemak" => layout::Layout::Colemak,
         "colemakdh" => layout::Layout::ColemakDH,
-        &_ => {
-            layout::Layout::Qwerty
-        }
+        &_ => layout::Layout::Qwerty,
     };
     let out_layout = match args.emu_out.as_str() {
         "qwerty" => layout::Layout::Qwerty,
@@ -171,11 +201,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "dvorak" => layout::Layout::Dvorak,
         "colemak" => layout::Layout::Colemak,
         "colemakdh" => layout::Layout::ColemakDH,
-        &_ => {
-            layout::Layout::Qwerty
-        }
+        &_ => layout::Layout::Qwerty,
     };
-    let out_layout_string = layout::get_layout_string(&out_layout);
+    let out_layout_string = layout::get_layout_string(&out_layout, args.show_ortho);
 
     let mut state = AppState {
         current_lesson_number: 0,
@@ -226,7 +254,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             cat_timer = std::time::Duration::from_millis(0);
             cat_frame = cat_iter.next().expect("cat frame not found").to_string();
         }
-
     }
 
     tui::cleanup_tui()?;
