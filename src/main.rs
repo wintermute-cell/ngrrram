@@ -1,71 +1,105 @@
 use clap::Parser;
 
-mod tui;
-mod game;
-mod ngrams;
-mod layout;
 mod cat;
+mod game;
+mod layout;
+mod ngrams;
+mod tui;
+
+use ngrams::{english::EnglishData, programming::ProgrammingData, NgramData, NgramGroup};
 
 #[derive(Parser)]
 //#[command(author, version, about, long_about = None)]
 struct Args {
+    #[arg(
+        short = 'g',
+        long,
+        value_enum,
+        default_value_t = NgramGroup::default(),
+        help = "which ngram group to work from. Defaults is {NgramGroup::default:?}"
+    )]
+    ngram_group: NgramGroup,
 
-    #[arg(short, long, default_value = "2",
+    #[arg(
+        short,
+        long,
+        default_value = "2",
         value_name = "2|3|4|w|file",
         help = "use bi-(2), tri-(3), tetragrams(4), (w)ords or comma separated wordlist file."
     )]
     n: String,
 
-    #[arg(short, long, default_value = "50",
+    #[arg(
+        short,
+        long,
+        default_value = "50",
         value_name = "1-200",
         help = "use the top X ngrams ordered by usage."
     )]
     top: i32,
 
-    #[arg(short, long, default_value = "2",
+    #[arg(
+        short,
+        long,
+        default_value = "2",
         value_name = "1-200",
         help = "how many different ngrams to use in a single lesson."
     )]
     combi: i32,
 
-    #[arg(short, long, default_value = "3",
+    #[arg(
+        short,
+        long,
+        default_value = "3",
         value_name = "number",
         help = "how often to repeat *each* different ngram in a lesson."
     )]
     rep: i32,
 
-    #[arg(short, long, default_value = "40",
+    #[arg(
+        short,
+        long,
+        default_value = "40",
         value_name = "number",
         help = "the wpm threshold at which the lesson is considered a success."
     )]
     wpm: i32,
 
-    #[arg(short, long, default_value = "94",
+    #[arg(
+        short,
+        long,
+        default_value = "94",
         value_name = "0-100",
         help = "the accuracy in percent at which the lesson is considered a success."
     )]
     acc: i32,
 
-    #[arg(long, action, default_value = "",
+    #[arg(
+        long,
+        action,
+        default_value = "",
         value_name = "layout",
         help = "your current keyboard layout. only needed if you want to emulate a different layout. see docs for supported layouts."
     )]
     emu_in: String,
 
-    #[arg(long, action, default_value = "",
+    #[arg(
+        long,
+        action,
+        default_value = "",
         value_name = "layout",
         help = "the layout you want to emulate. only needed if you want to emulate a different layout. see docs for supported layouts."
     )]
     emu_out: String,
 
-    #[arg(long, action,
+    #[arg(
+        long,
+        action,
         help = "pass this flag to disable the keyboard layout display."
     )]
     nokb: bool,
 
-    #[arg(long, action,
-        help = "the most important flag. don't practice alone."
-    )]
+    #[arg(long, action, help = "the most important flag. don't practice alone.")]
     cat: bool,
 }
 
@@ -92,25 +126,19 @@ struct AppState {
     use_emulation: bool,
 }
 
-fn try_get_from_file(path: &str) -> Vec<String> {
-    // check if path is a file
-    if std::path::Path::new(path).is_file() {
-        return ngrams::get_from_file(path.to_string());
-    } else {
-        println!("File not found: {}", path);
-        std::process::exit(1);
-    }
-}
-
-fn get_ngrams(args: &Args) -> Vec<String> {
-    let ngrams = match args.n.as_str() {
-        "2" => ngrams::get_bigrams(),
-        "3" => ngrams::get_trigrams(),
-        "4" => ngrams::get_tetragrams(),
-        "w" => ngrams::get_wordlist(),
-        &_ => try_get_from_file(&args.n),
+fn get_ngrams(args: &Args) -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    let ngram_data: Box<dyn NgramData> = match args.ngram_group {
+        NgramGroup::English => Box::new(EnglishData {}),
+        NgramGroup::Programming => Box::new(ProgrammingData {}),
     };
-    ngrams
+
+    match args.n.as_str() {
+        "2" => Ok(ngram_data.get_bigrams()),
+        "3" => Ok(ngram_data.get_trigrams()),
+        "4" => Ok(ngram_data.get_tetragrams()),
+        "w" => Ok(ngram_data.get_wordlist()),
+        &_ => ngrams::get_from_file(&args.n),
+    }
 }
 
 fn validate_args(args: &Args) -> bool {
@@ -160,9 +188,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "dvorak" => layout::Layout::Dvorak,
         "colemak" => layout::Layout::Colemak,
         "colemakdh" => layout::Layout::ColemakDH,
-        &_ => {
-            layout::Layout::Qwerty
-        }
+        &_ => layout::Layout::Qwerty,
     };
     let out_layout = match args.emu_out.as_str() {
         "qwerty" => layout::Layout::Qwerty,
@@ -171,9 +197,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "dvorak" => layout::Layout::Dvorak,
         "colemak" => layout::Layout::Colemak,
         "colemakdh" => layout::Layout::ColemakDH,
-        &_ => {
-            layout::Layout::Qwerty
-        }
+        &_ => layout::Layout::Qwerty,
     };
     let out_layout_string = layout::get_layout_string(&out_layout);
 
@@ -199,7 +223,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         use_emulation: args.emu_in != "" && args.emu_out != "", // only use emulation if both are set
     };
 
-    state.ngrams = get_ngrams(&args);
+    state.ngrams = get_ngrams(&args)?;
 
     let mut terminal = tui::init_tui()?;
 
@@ -226,7 +250,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             cat_timer = std::time::Duration::from_millis(0);
             cat_frame = cat_iter.next().expect("cat frame not found").to_string();
         }
-
     }
 
     tui::cleanup_tui()?;
