@@ -82,7 +82,7 @@ impl NgramData for EnglishData {
             "once", "enta",
         ]
         .into_iter()
-        .map(|s| s.to_string())
+        .map(String::from)
         .collect()
     }
 
