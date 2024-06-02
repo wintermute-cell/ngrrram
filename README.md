@@ -62,16 +62,21 @@ flags, but starts with the recommended defaults if unconfigured.
 
 Options:
 ```
---n <2|3|4|w|FILENAME>       use bigrams(2) trigrams(3) tetragrams(4) or words(w), or specify your own comma separated wordlist as a file.
---top <1-200>                use the top X ngrams ordered by usage.
---combi <1-200>              how many different ngrams to use in a single lesson.
---rep <number>               how often to repeat *each* different ngram in a lesson.
---wpm <number>               the wpm threshold at which the lesson is considered a success.
---acc <0-100>                the accuracy in percent at which the lesson is considered a success.
---emu-in <layout>            see section (## Layout Emulation).
---emu-out <layout>           see section (## Layout Emulation).
---nokb                       pass this flag to disable the keyboard layout display.
---cat                        the most important flag. don't practice alone.
+Usage: ngrrram [OPTIONS]
+
+Options:
+  -n, --n <2|3|4|w|file>  use bi-(2), tri-(3), tetragrams(4), (w)ords or comma separated wordlist file. [default: 2]
+  -t, --top <1-200>       use the top X ngrams ordered by usage. [default: 50]
+  -c, --combi <1-200>     how many different ngrams to use in a single lesson. [default: 2]
+  -r, --rep <number>      how often to repeat *each* different ngram in a lesson. [default: 3]
+  -w, --wpm <number>      the wpm threshold at which the lesson is considered a success. [default: 40]
+  -a, --acc <0-100>       the accuracy in percent at which the lesson is considered a success. [default: 94]
+      --emu-in <layout>   your current keyboard layout. only needed if you want to emulate a different layout. see docs for supported layouts. [default: ]
+      --emu-out <layout>  the layout you want to emulate. only needed if you want to emulate a different layout. see docs for supported layouts. [default: ]
+      --show-ortho        show keyboard in ortholinear format
+      --nokb              pass this flag to disable the keyboard layout display.
+      --cat               the most important flag. don't practice alone.
+  -h, --help              Print help
 ```
 
 If you start `ngrrram` without parameters, it uses these recommended defaults:
