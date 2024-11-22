@@ -52,8 +52,7 @@ The executable will then be located at `./target/release/ngrrram`
 
 ### Looking for help packaging!
 
-For now `ngrrram` is not available in any package repo. If you'd like to help
-by packaging for your platform, I'd gladly accept!
+If you'd like to help by packaging for your platform, I'd gladly accept!
 
 ## Usage
 
